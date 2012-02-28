@@ -1,0 +1,68 @@
+body {
+  text-align: center; //for ie
+}
+
+.case {
+  text-align: center;
+  width: 50px;
+  height: 48px; 
+}
+
+.red {
+  background-color: red;
+}
+
+.black {
+  background-color: black;
+  filter:alpha(opacity=50);
+}
+
+
+.dash {
+  width: 400px;
+  height: 400px;
+  margin: auto;
+  color: white;
+  font-size: 30px;
+}
+
+.dash.rotated {
+	-webkit-transform: rotate(180deg);
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0px;
+}
+
+table, td, th
+{
+  border: 0px;
+}
+
+.blackp {
+  font-size: 30px;
+  color: #777;
+}
+
+.whitep {
+	font-size: 30px;
+	color: white;
+}
+
+.deadz {
+  width: 110px;
+  min-height: 100px;
+}
+
+.deadz.white  {
+  float: right;
+  background-color: grey;
+  
+  
+}
+
+.deadz.black {
+  float: left;
+  background-color: #eee;
+}

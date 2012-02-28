@@ -1,0 +1,37 @@
+@(helloForm: Form[String])
+
+@import helper._
+
+@main(title = "The 'helloworld' application") {
+	<h1>Creating a game room</h1>
+	
+	@form(action = routes.Application.createGame, 'id -> "gameForm") {
+		
+		
+		<input id="game" type="text" name="game" placeholder="game name to load or create" autofocus>
+		
+		<input type="submit" value="Play" tabindex="1">
+		
+		<script>
+			$(function() {
+				 
+				 window.addEventListener("online", function() {
+					alert("You are online");
+				 }, false);
+				 
+				 window.addEventListener("offline", function() {
+					alert("You are offline");
+				 }, false);
+				var games = []
+				for(var i in window.localStorage) 
+					games.push(i)
+				
+				$( "#game" ).autocomplete({
+					source: games
+				});
+			});
+		</script>
+	
+	}
+
+}

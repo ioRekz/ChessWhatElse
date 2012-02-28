@@ -1,0 +1,16 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /joinGame                  		controllers.Application.joinGame
+
+GET     /game/:game                        	controllers.Application.index(game : String)
+GET		/								controllers.Application.hello
+
+POST	/createGame						controllers.Application.createGame
+
+
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)

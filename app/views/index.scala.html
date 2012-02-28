@@ -1,0 +1,193 @@
+@(game : String, pieces : String = "TCFDRFCT", order : List[Int] = List(1,2,3,4,5,3,2,1), pps : Map[Char,(String,String)] = Map('T' -> ("\u2656","\u265C"), 'C' -> ("\u2658","\u265E"), 'F' -> ("\u2657","\u265D"), 'D' -> ("\u2655","\u265B"), 'R' -> ("\u2654","\u265A")))(implicit request: RequestHeader)
+@****
+white chess king	♕	U+2654	&#9812;
+white chess queen	♔	U+2655	&#9813;
+white chess rook	♖	U+2656	&#9814;
+white chess bishop	♗	U+2657	&#9815;
+white chess knight	♘	U+2658	&#9816;
+white chess pawn	♙	U+2659	&#9817;
+black chess king	♚	U+265A	&#9818;
+black chess queen	♛	U+265B	&#9819;
+black chess rook	♜	U+265C	&#9820;
+black chess bishop	♝	U+265D	&#9821;
+black chess knight	♞	U+265E	&#9822;
+black chess pawn	♟	U+265F	&#9823;
+****@
+@main("Welcome to Play 2.0") {
+	
+		<fieldset id="blackpdead" class="deadz black">
+		<legend>Black deadz</legend>
+		
+		</fieldset>
+    
+        <fieldset id="whitepdead" class="deadz white">
+		<legend>White deadz</legend>
+		</fieldset>
+		
+    	<table class="dash">
+	@for(i<-1 to 8) {
+		<tr>
+		@for(j<-1 to 8; count = 1) {
+			
+			<td id="@i-@j" class="droppable case @if((i+j%2)%2==0){red}else{black}">
+				@if(i == 1 || i == 2) {
+				  <span id="@if(i==1) {@pieces(j-1).toLower} else {p}" class="draggable blackp">
+				}
+				@if(i == 7 || i == 8) {
+				  <span id="@if(i==8) {@pieces(j-1)} else {P}" class="draggable whitep">
+				}
+				
+				@{i match {
+				  case 2 | 7 => "\u265F"
+				  case 1 | 8=> pps(pieces(j-1))._2
+				  case _ => ""
+				}}		
+				
+
+				
+				</span>
+			</td>	
+		}
+		</tr>
+	}
+	</table>
+	<script>
+		var pps = {T:"\u265C", C : "\u265E", F : "\u265D", D : "\u265B", R : "\u265A", P : "\u265F"};//add pions
+		var order= "TCFDRFCT";
+		
+		$(function() {
+			//'T' -> ("\u2656","\u265C"), 'C' -> ("\u2658","\u265E"), 'F' -> ("\u2657","\u265D"), 'D' -> ("\u2655","\u265B"), 'R' -> ("\u2654","\u265A")))
+			//var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
+			//var chatSocket = new WebSocket("@routes.Application.joinGame().webSocketURL()")
+			
+			var saveGame = function(gameName) {
+			//alert($("#"+2+"-"+2).children("span").attr("id"));
+			//vivants
+			//sendMessage(); 
+			var game="";
+			var empty = 0;
+			for(i = 1; i<9; i++) {
+				empty = 0;
+				game+='\\';
+				for(j=1; j<9; j++) {
+					var piece = $("#"+i+"-"+j).children("span");
+					
+					if( piece.attr("id") ) {
+						if(empty>0)
+						{game+=empty; empty = 0;}
+						game+=piece.attr("id")
+						
+					} else empty++;
+				}
+				if(empty>0) game+=empty;
+			}
+			
+			//deadz	
+			var alldeadz = $(".deadz").children("span");			
+			var deadzString = "";
+			for(i = 0; i<alldeadz.length; i++){
+				deadzString += alldeadz[i].id;
+			}
+			game += " " + deadzString;
+			
+			window.localStorage[gameName]=(game.substring(1,game.length))
+			//window.loadGame()
+		}
+		
+		
+		var areFriend = function(p1,p2) {
+			return ((p1.hasClass("blackp") && p2.hasClass("blackp")) || ((p1.hasClass("whitep")) && (p2.hasClass("whitep"))));
+		}
+		var areEnemy = function(p1,p2) {
+			return ((p1.hasClass("blackp") && p2.hasClass("whitep")) || ((p1.hasClass("whitep")) && (p2.hasClass("blackp"))));
+		}
+		var setDraggables = function() {
+			$( ".draggable" ).draggable({ grid: [ 50, 50 ], revert: "invalid" });
+		}
+		var setDroppables = function() {
+			$( ".droppable" ).droppable({
+				accept: function(drag) {
+				  return !areFriend( $( this ).children("span") , drag );
+				},
+				drop: function(event,ui) {
+					//alert('toto');
+					//$( this ).effect("transfer", {to: "#blackdead", className: "ui-effects-transfer" }, 500, callback);
+					var dropp = $(this).children("span");
+					if(areEnemy(dropp, ui.draggable)) {
+						
+						if(dropp.hasClass("blackp"))
+							dropp.appendTo("#blackpdead");
+						else dropp.appendTo("#whitepdead");
+					}
+					ui.draggable.appendTo($(this));
+					//window.localStorage.piece = JSON.stringify({data:5});
+					ui.draggable.css({"left" : "0px","right" : "0px","top" : "0px","bottom" : "0px"});
+					saveGame("@game");
+				}
+			});
+			$( ".deadz" ).droppable({});
+		}
+		
+		var loadGame = function(gameName) {
+			$("span").remove()
+			var game = window.localStorage[gameName];
+			var board = game.split(' ');
+			var lines = board[0].split('\\');
+			var deadz = board[1];
+			
+			//vivants
+			for(i=0;i<8;i++) {
+				var trueJ = 1;
+				for(j=0;j<lines[i].length;j++) {
+					var chara = lines[i][j]
+					if(!isNaN(chara * 1))
+						trueJ += chara * 1; 
+					else {
+						var span = '<span id="'+chara+'" class="draggable '+(chara == chara.toLowerCase() ? 'blackp' : 'whitep')+'">'
+						span += pps[chara.toUpperCase()]+'</span>';
+						$("#"+(i+1)+"-"+trueJ).append(span);
+						trueJ++;
+					}
+				} 
+			}
+			
+			//deadz
+			for(i=0; i<deadz.length; i++) {
+				var p = deadz[i];
+				if(p.toLowerCase() == p)
+					$("#blackpdead").append(getSpanPiece(p,"blackp"));
+				else $("#whitepdead").append(getSpanPiece(p,"whitep"));
+			}
+			
+			setDraggables();
+			
+		}
+		
+		var getSpanPiece = function(id,clazz) {
+			var span = '<span id="'+id+'" class="'+clazz+'">'
+			span += pps[id.toUpperCase()]+'</span>';
+			return span;
+		}
+			
+			
+			//var sendMessage = function() {
+              //  chatSocket.send("alo")
+            //}
+			
+			var receiveEvent = function(event) {
+				alert(event.data)
+			}
+			
+			if(window.localStorage["@game"]) loadGame("@game");
+			setDraggables();
+			setDroppables();
+			
+			//chatSocket.onmessage = receiveEvent
+			
+			
+		
+		
+		});
+		
+	</script>
+}
