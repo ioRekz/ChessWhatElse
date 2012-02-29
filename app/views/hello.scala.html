@@ -8,9 +8,12 @@
 	@form(action = routes.Application.createGame, 'id -> "gameForm") {
 		
 		
-		<input id="game" type="text" name="game" placeholder="game name to load or create" autofocus>
-		
+		<input id="game" type="text"  placeholder="create a new game" autofocus>		
 		<input type="submit" value="Play" tabindex="1">
+		
+		<select id="games" name="game" data-placeholder="or load a game" class="chzn-select" style="width:350px;" tabindex="2">
+                <option value=""></option>
+		</select>
 		
 		<script>
 			$(function() {
@@ -22,13 +25,11 @@
 				 window.addEventListener("offline", function() {
 					alert("You are offline");
 				 }, false);
-				var games = []
-				for(var i in window.localStorage) 
-					games.push(i)
 				
-				$( "#game" ).autocomplete({
-					source: games
-				});
+				for(var i in window.localStorage) 
+					$("#games").append("<option>"+i+"</option>")
+				
+				$(".chzn-select").chosen();
 			});
 		</script>
 	

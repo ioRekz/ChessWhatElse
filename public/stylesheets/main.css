@@ -45,6 +45,10 @@ table, td, th
   color: #777;
 }
 
+span {
+	cursor : pointer;
+}
+
 .whitep {
 	font-size: 30px;
 	color: white;
@@ -66,3 +70,5 @@ table, td, th
   float: left;
   background-color: #eee;
 }
+
+.ui-effects-transfer { border: 2px dotted gray; } 

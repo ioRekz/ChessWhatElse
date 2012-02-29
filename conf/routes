@@ -3,12 +3,14 @@
 # ~~~~
 
 # Home page
-GET     /joinGame                  		controllers.Application.joinGame
+GET     /joinGame            												controllers.Application.joinGame(game : String, game2 : Option[String])
+GET			/blitz/:game/:opponent											controllers.Application.blitz(game: String, opponent: String)
+GET			/normal/:game																controllers.Application.normal(game:String)
+GET			/																						controllers.Application.hello
+# Mix normal & blitz with regex (argument optionnel)
+POST		/createGame																	controllers.Application.createGame
 
-GET     /game/:game                        	controllers.Application.index(game : String)
-GET		/								controllers.Application.hello
 
-POST	/createGame						controllers.Application.createGame
 
 
 
