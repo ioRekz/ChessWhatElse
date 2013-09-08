@@ -33,12 +33,13 @@ object Application extends Controller {
   }
   
   
-  var players = List[(String,PushEnumerator[JsValue])]()
+  var players = List[(String,(Enumerator[JsValue],Concurrent.Channel[JsValue]))]()
   var blitzz = List[(String,String)]()
   
   def joinGame(game : String, game2 : Option[String]) = WebSocket.using[JsValue] { implicit request =>
 		 // Log events to the console
 		  val in = Iteratee.foreach[JsValue]{ msg =>
+				println(msg)
 				val currgame = (msg \ "game").as[String]
 				(msg \ "dead").asOpt[String] match {
 					case Some(dead) => {
@@ -47,7 +48,7 @@ object Application extends Controller {
 						val otherTable = if(duo.get._1 == currgame) duo.get._2 else duo.get._1
 
 						players.find ( _._1 == otherTable ) match {
-							case Some(table) => table._2.push(
+							case Some(table) => table._2._2.push(
 								JsObject(
 									Seq(
 									"help" -> JsString(dead)
@@ -59,18 +60,20 @@ object Application extends Controller {
 					
 					case None => println("pas de mort")
 				}
-				for(p <- players if p._1 == currgame ) {println(msg); p._2 push msg}
+				println(currgame)
+				for(p <- players) println(p._1)
+				for(p <- players if p._1 == currgame ) {println(msg); p._2._2 push msg}
 		  }.mapDone { _ =>
 				println("Disconnected")
 		  }
 	
 		  // Send a single 'Hello!' message
-		  players = (game, Enumerator.imperative[JsValue]()) +: players
+		  players = (game, Concurrent.broadcast[JsValue]) +: players
 			game2 foreach { g2 =>
 				blitzz = (game,g2) :: blitzz
 			}
 			
-		  (in, players.head._2)
+		  (in, players.head._2._1)
   }
 	
 	def blitzSock(game: String, game2 : String) = WebSocket.using[JsValue] { implicit request =>
@@ -78,14 +81,14 @@ object Application extends Controller {
 				val s = (msg \ "game").as[String]
 				val board = (msg \ "board").as[String]
 				val lastdead = board.split(" ")(1)(0)
-				for(p <- players if p._1 == s ) {println(msg); p._2 push msg}
+				for(p <- players if p._1 == s ) {println(msg); p._2._2 push msg}
 		  }.mapDone { _ =>
 				println("Disconnected")
 		  }
+
+			players = (game, Concurrent.broadcast[JsValue]) +: players
 			
-			players = (game, Enumerator.imperative[JsValue]()) +: players
-			
-		  (in, players.head._2)
+		  (in, players.head._2._1)
 	
 	}
   

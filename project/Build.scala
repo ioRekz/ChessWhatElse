@@ -10,7 +10,9 @@ object ApplicationBuild extends Build {
     val appDependencies = Seq(
       // Add your project dependencies here,
     )
-
-    val main = play.Project(appName, appVersion, appDependencies).settings()
+    
+    val main = play.Project(appName, appVersion, appDependencies).settings(
+	coffeescriptOptions := Seq("bare")
+    )
 
 }
