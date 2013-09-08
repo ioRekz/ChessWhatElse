@@ -4,16 +4,20 @@
 
 @main(title = "The 'helloworld' application") {
 	<h1>Creating a game room</h1>
-	
+
 	@form(action = routes.Application.createGame, 'id -> "gameForm") {
 		
 		
-		<input id="game" type="text"  placeholder="create a new game" autofocus>		
+		<input id="game" name="game" type="text"  placeholder="create a new game" autofocus>		
 		<input type="submit" value="Play" tabindex="1">
-		
+	}
+
+	@form(action = routes.Application.createGame, 'id -> "gameForm") {
 		<select id="games" name="game" data-placeholder="or load a game" class="chzn-select" style="width:350px;" tabindex="2">
                 <option value=""></option>
 		</select>
+		<input type="submit" value="Play" tabindex="1">
+	}
 		
 		<script>
 			$(function() {
@@ -32,7 +36,5 @@
 				$(".chzn-select").chosen();
 			});
 		</script>
-	
-	}
 
 }

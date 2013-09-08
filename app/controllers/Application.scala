@@ -10,7 +10,7 @@ import play.api.libs.json._
 object Application extends Controller {
   
   val helloForm = Form(
-		"game" -> nonEmptyText 
+	"game" -> nonEmptyText
   )
   
   def index(game : String, opp : Option[String]) = Action { implicit request =>
