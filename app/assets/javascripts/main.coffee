@@ -22,14 +22,14 @@ setDroppables = ->
 			dropp = $(this).children("span")
 			if(areEnemy(dropp, ui.draggable))
 				if(!opponent)
-					alert "remove"+dropp.attr("id")
-					dead = dropp.attr("id")
-					dropp.remove()
-				else
 					if(dropp.hasClass("blackp"))
 						dropp.appendTo("#blackpdead")
 					else
 						dropp.appendTo("#whitepdead")
+				else
+					dead = dropp.attr("id")
+					dropp.remove()
+
 			ui.draggable.appendTo($(this))
 			ui.draggable.css({"left" : "0px","right" : "0px","top" : "0px","bottom" : "0px"})
 			
@@ -115,10 +115,9 @@ getSpanPiece = (id,clazz) ->
 	span
 
 	
-sendMessage = (msg) -> chatSocket.send(msg); alert "SENT"
+sendMessage = (msg) -> chatSocket.send(msg)
 
 receiveEvent = (event) ->
-	alert "EVENT !"
 	data = JSON.parse(event.data)
 	if(data.board) then setCurrentBoard(data.board)
 	if(data.help) then setCurrentBoard(getCurrentBoard()+data.help) #space problems

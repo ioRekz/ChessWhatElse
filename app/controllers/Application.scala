@@ -39,7 +39,6 @@ object Application extends Controller {
   def joinGame(game : String, game2 : Option[String]) = WebSocket.using[JsValue] { implicit request =>
 		 // Log events to the console
 		  val in = Iteratee.foreach[JsValue]{ msg =>
-				println(msg)
 				val currgame = (msg \ "game").as[String]
 				(msg \ "dead").asOpt[String] match {
 					case Some(dead) => {
@@ -60,8 +59,6 @@ object Application extends Controller {
 					
 					case None => println("pas de mort")
 				}
-				println(currgame)
-				for(p <- players) println(p._1)
 				for(p <- players if p._1 == currgame ) {println(msg); p._2._2 push msg}
 		  }.mapDone { _ =>
 				println("Disconnected")
